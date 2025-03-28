@@ -1102,7 +1102,9 @@ const default_site_info = {
     '财神': {'url': 'https://cspt.top/', 'enable': 1},
     '星陨阁': {'url': 'https://xingyunge.top/', 'enable': 1},
     '伞': {'url': 'http://sanpro.pw/', 'enable': 1},
-    '柠檬不甜': {'url': 'https://lemonhd.net/', 'enable': 1}
+    '柠檬不甜': {'url': 'https://lemonhd.net/', 'enable': 1},
+    '下水道': {'url': 'https://sewerpt.com/', 'enable': 1}
+
 };
 
 var chd_use_backup_url = GM_getValue('chd_use_backup_url') === undefined ? 0: GM_getValue('chd_use_backup_url');
@@ -6121,7 +6123,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             var attendance_sites = ['PThome', 'HDHome', 'HDDolby', 'Audiences', 'PTLGS', 'SoulVoice','OKPT', 'UltraHD', 'CarPt', 'ECUST', 'iloli', 'PTChina', 'HDClone', '回声', '伞',
                 'HDVideo', 'HDAtmos', 'HDTime', 'FreeFarm', 'HDfans', 'PTT', 'HDPt', 'ZMPT', 'OKPT', '悟空', 'CrabPt', 'QingWa', 'ICC', 'LemonHD', '1PTBA', 'HDBAO', 'AFUN', '星陨阁',
                 'CyanBug', '杏林', '海棠', 'Panda', 'KuFei', 'RouSi', 'PTCafe', 'GTK', 'HHClub', '象岛', '麒麟','AGSV', 'Oshen', 'PTFans', 'PTzone', '雨', '唐门', '财神', 'DevTraker',
-                'CDFile','柠檬不甜'
+                'CDFile','柠檬不甜', '下水道'
             ];
 
             attendance_sites.forEach((e)=>{
@@ -15336,6 +15338,16 @@ function auto_feed() {
                     if (labels.hdr10plus) { check_label(document.getElementsByName('tags[4][]'), '7');}
                     if (raw_info.standard_sel.match('4K')){ check_label(document.getElementsByName('tags[4][]'), '7'); }
                     break;
+                case '下水道':
+                    if (labels.gy){ check_label(document.getElementsByName('tags[4][]'), '5'); }
+                    if (labels.yy){ check_label(document.getElementsByName('tags[4][]'), '15'); }
+                    if (labels.zz){ check_label(document.getElementsByName('tags[4][]'), '6'); }
+                    if (labels.diy){ check_label(document.getElementsByName('tags[4][]'), '4'); }
+                    if (labels.hdr10 || labels.hdr10plus) { check_label(document.getElementsByName('tags[4][]'), '7');}
+                    if (labels.db || raw_info.descr.match(/杜比|Dolby/i)) { check_label(document.getElementsByName('tags[4][]'), '14'); }
+                    if (labels.complete){ check_label(document.getElementsByName('tags[4][]'), '12'); }
+                    if (raw_info.medium_sel == 'Blu-ray' || raw_info.medium_sel == 'UHD') { check_label(document.getElementsByName('tags[4][]'), '10'); }
+                    break;
             }
         } catch (err) {
         }
@@ -22425,7 +22437,75 @@ function auto_feed() {
             check_team(raw_info, 'team_sel[4]');
 
         }
+        
+        else if (forward_site == '下水道'){
+            var browsecat = $('#browsecat');
+            var type_dict = {'电影': 401, '纪录': 404, '动漫': 405, '剧集': 402, '综艺': 403, '音乐': 408, '': 409};
+            browsecat.val(409)
+            if (type_dict.hasOwnProperty(raw_info.type)){
+                var index = type_dict[raw_info.type];
+                browsecat.val(index);
+            }
+            document.getElementById('browsecat').dispatchEvent(evt);
 
+            //媒介
+            var medium_box = $('select[name="medium_sel[4]"]');
+            medium_box.val(0);
+            switch(raw_info.medium_sel){
+                case 'UHD': case 'Blu-ray': medium_box.val(1); break;
+                case 'HD DVD': medium_box.val(2); break;
+                case 'Remux': medium_box.val(3); break;
+                case 'MiniBD': medium_box.val(4); break;
+                case 'HDTV': medium_box.val(5); break;
+                case 'DVD': medium_box.val(6); break;
+                case 'Encode': medium_box.val(7); break;
+                case 'CD': medium_box.val(8); break;
+                case 'WEB-DL': medium_box.val(10); break;
+            }
+
+            //编码
+            var codec_box = $('select[name="codec_sel[4]"]');
+            codec_box.val(5);
+            switch (raw_info.codec_sel){
+                case 'H264': case 'X264': codec_box.val(1); break;
+                case 'H265': case 'X265': codec_box.val(6); break;
+                case 'VC-1': codec_box.val(2); break;
+                case 'XVID': codec_box.val(3); break;
+                case 'MPEG-2': codec_box.val(4); break;
+            }
+
+            //音频编码
+            var audiocodec_box = $('select[name="audiocodec_sel[4]"]');
+            audiocodec_box.val(7);
+            switch (raw_info.audiocodec_sel){
+                case 'DTS-HD': case 'DTS-HDMA': audiocodec_box.val(14); break;
+                case 'DTS:X': case 'DTS-HDMA:X 7.1': audiocodec_box.val(15); break;
+                case 'DTS': audiocodec_box.val(3); break;
+                case 'AAC': audiocodec_box.val(6); break;
+                case 'Flac': audiocodec_box.val(1); break;
+                case 'APE': audiocodec_box.val(2); break;
+                case 'MP3': audiocodec_box.val(4); break;
+                case 'AC3': audiocodec_box.val(8); break;
+                case 'TrueHD': audiocodec_box.val(13); break;
+                case 'Atmos': audiocodec_box.val(12); break;
+                case 'LPCM': audiocodec_box.val(16); break;
+                case 'WAV': audiocodec_box.val(10); break;
+                case 'E-AC3': audiocodec_box.val(11); break;
+            }
+
+            //分辨率
+            var standard_box = $('select[name="standard_sel[4]"]');
+            standard_box.val(0);
+            switch (raw_info.standard_sel){
+                case '1080p': case '1080i': standard_box.val(1); break;
+                case '720p': standard_box.val(3); break;
+                case '480p': standard_box.val(2); break;
+                case '4K': case '2160p': standard_box.val(5); break;
+                case '8K': case '4320p': standard_box.val(6); break;
+            }
+
+            $('select[name="team_sel[4]"]').val(5);
+        }
         else if (forward_site == 'HDVideo') {
             var browsecat = $('select[name=type]');
             var type_dict = {'电影': 401, '剧集': 402, '动漫': 405, '综艺': 403, '音乐': 408, '纪录': 404,
